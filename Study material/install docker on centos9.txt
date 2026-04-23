@@ -1,0 +1,66 @@
+ריכזתי לך את כל הפקודות להתקנת Docker ב-**CentOS 9 Stream** בצורה מסודרת. מכיוון שאתה עובד על שרת `SRV1` בתוך Vagrant, אלו הפקודות המדויקות שאתה צריך להריץ (מומלץ להעתיק אחת-אחת):
+
+### 1. ניקוי גרסאות ישנות (למניעת התנגשויות)
+גם אם השרת חדש, תמיד כדאי לוודא שאין שאריות:
+```bash
+sudo dnf remove -y docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+```
+
+### 2. התקנת כלי עזר והוספת המאגר הרשמי
+אנחנו מוסיפים את המאגר של Docker כדי ש-CentOS ידע מאיפה להוריד את הגרסה הכי מעודכנת:
+```bash
+sudo dnf install -y yum-utils
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+### 3. התקנת ה-Docker Engine והרכיבים
+ב-CentOS 9, לפעמים יש התנגשות עם חבילות מובנות (כמו `buildah`), לכן אנחנו מוסיפים את הדגל `--allowerasing`:
+```bash
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin --allowerasing
+```
+
+
+
+### 4. הפעלת השירות (Daemon)
+פקודה זו מפעילה את דוקר עכשיו וגם מגדירה שהוא יעלה אוטומטית בכל פעם שתדליק את השרת (`vagrant up`):
+```bash
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+### 5. הגדרת הרשאות (כדי שלא תצטרך `sudo` כל פעם)
+כדי שתוכל להריץ פקודות דוקר בתור המשתמש `vagrant` הרגיל שלך:
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+---
+
+### 6. בדיקה שהכל עובד
+הרץ את הפקודה הזו כדי לוודא שדוקר "חי" ומגיב:
+```bash
+docker run hello-world
+```
+
+
+
+### בונוס: הפקודות ל-Nginx (מה שעשינו קודם)
+אם אתה רוצה להקים שוב את שרת האינטרנט שלך:
+```bash
+# הרצת הקונטיינר
+docker run -d --name my-web -p 8080:80 nginx
+
+# העתקת קובץ ה-index.html שיצרת
+docker cp index.html my-web:/usr/share/nginx/html/index.html
+```
+
+**שים לב:** אם אתה מתכנן לעשות ניסויים "מסוכנים" עכשיו, זה הזמן המעולה להריץ את פקודת הסנאפשוט שלמדת קודם:
+`vagrant snapshot save SRV1 docker_installed`
