@@ -1,0 +1,68 @@
+# Docker Commands Guide - Cheat Sheet
+# מבוסס על סדר הלימוד בתמונה ומותאם לתרגול מעשי
+
+## 1. Concepts
+- Image: תבנית קריאה בלבד הכוללת את מערכת ההפעלה, הסביבה והקוד (כמו קובץ התקנה).
+- Container: מופע רץ של אימג' (כמו תוכנה מותקנת ורצה).
+- Tag: גרסה של האימג' (למשל mariadb:10.6 או nginx:latest).
+
+## 2. Image Commands
+docker pull [image]
+# הורדת אימג' מה-Docker Hub למחשב המקומי.
+# דוגמה: docker pull nginx
+
+docker images
+# הצגת כל האימג'ים שקיימים כרגע על המכונה.
+
+docker rmi [image_id/name]
+# מחיקת אימג' מהמחשב.
+
+## 3. Container Commands (Basic & Options)
+docker run [options] [image]
+# יצירה והרצה של קונטיינר חדש מתוך אימג'.
+
+# אופציות נפוצות ל-run:
+# -d : הרצה ברקע (Detached mode).
+# -p [host_port]:[container_port] : מיפוי פורטים (למשל 8080:80).
+# --name [name] : מתן שם מותאם אישית לקונטיינר.
+# -v [host_path]:[container_path] : חיבור תיקייה מהמחשב לקונטיינר (Volumes).
+# -e [VAR=value] : הגדרת משתני סביבה (Environment Variables).
+# --rm : מחיקה אוטומטית של הקונטיינר כשהוא נעצר.
+
+# דוגמה להרצה מלאה:
+# docker run -d -p 8080:80 --name my-web nginx
+
+docker stop [container_id/name]
+# עצירה של קונטיינר רץ בצורה מסודרת.
+
+docker start [container_id/name]
+# הפעלה מחדש של קונטיינר קיים שנעצר.
+
+docker rm -f [container_id/name]
+# מחיקה של קונטיינר (האופציה -f כופה מחיקה גם אם הוא רץ).
+
+## 4. Inspection & Monitoring
+docker ps
+# הצגת קונטיינרים פעילים בלבד.
+
+docker ps -a
+# הצגת כל הקונטיינרים (גם אלו שנעצרו).
+
+docker logs [container_id/name]
+# הצגת הפלט (Logs) של הקונטיינר - קריטי לפתרון שגיאות (Debug).
+# אופציה: docker logs -f (מעקב חי אחרי הלוגים).
+
+docker exec -it [container_id/name] [command]
+# הרצת פקודה בתוך קונטיינר רץ.
+# שימוש נפוץ לכניסה לטרמינל פנימי: docker exec -it [name] bash
+
+## 5. Maintenance & Cleanup
+docker system prune
+# מחיקת כל הקונטיינרים העצורים, הרשתות שאינן בשימוש ואימג'ים ללא שם (Dangling).
+# זהירות: הפקודה מוחקת מידע שאינו רץ כרגע!
+
+docker compose up -d
+# הרצה של מערך קונטיינרים שלם לפי קובץ yaml.
+
+docker compose down
+# עצירה ומחיקה של כל המערך המוגדר ב-compose.
